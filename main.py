@@ -853,7 +853,6 @@ VAGUE_PATTERNS = [
     "need an assessment",
     "recommend assessment",
     "help me hire",
-    "i am hiring",
     "need test",
 ]
 
