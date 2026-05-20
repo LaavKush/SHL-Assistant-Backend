@@ -1,6 +1,24 @@
-# AI Assessment Recommender
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:141E30,50:243B55,100:0F2027&height=200&section=header&text=AI%20Assessment%20Recommender&fontSize=38&fontColor=ffffff&animation=fadeIn&fontAlignY=38" />
+</p>
 
-A conversational agent that helps hiring managers find the right SHL Individual Test Solutions through multi-turn dialogue.
+<p align="center">
+  <b>Conversational AI Agent for Smart Assessment Recommendations</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AI-Groq%20LLM-blueviolet?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Retrieval-FAISS-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Embeddings-SentenceTransformers-yellow?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Frontend-Streamlit-red?style=for-the-badge" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/your-username/ai-assessment-recommender?style=social" />
+  <img src="https://img.shields.io/github/forks/your-username/ai-assessment-recommender?style=social" />
+  <img src="https://img.shields.io/github/license/your-username/ai-assessment-recommender" />
+</p>
 
 ## Architecture
 
@@ -162,3 +180,7 @@ Both support Python + `requirements.txt` autodeploy. Set the `GROQ_API_KEY` envi
 - Only recommends assessments present in `catalog.json`
 - URL validator strips any hallucinated URLs before responding
 - Refuses: general hiring advice, legal questions, salary questions, prompt injection attempts
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:141E30,50:243B55,100:0F2027&height=120&section=footer" />
+</p>
