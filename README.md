@@ -15,11 +15,6 @@
   <img src="https://img.shields.io/badge/Frontend-HTML%2FCSS%2FJS-red?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Hosting-Vercel-black?style=for-the-badge" />
 </p>
-<p align="center">
-  <img src="https://img.shields.io/github/stars/your-username/ai-assessment-recommender?style=social" />
-  <img src="https://img.shields.io/github/forks/your-username/ai-assessment-recommender?style=social" />
-  <img src="https://img.shields.io/github/license/your-username/ai-assessment-recommender" />
-</p>
 
 ## Architecture
 
