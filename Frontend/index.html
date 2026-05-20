@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Assessment Recommender</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+<style>
+  <!-- *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --bg-tertiary: #f0efec;
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --text-tertiary: #999;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.25);
+    --accent: #185FA5;
+    --accent-dark: #0C447C;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1e1e1e;
+      --bg-secondary: #2a2a2a;
+      --bg-tertiary: #141414;
+      --text-primary: #f0f0f0;
+      --text-secondary: #aaa;
+      --text-tertiary: #666;
+      --border: rgba(255,255,255,0.1);
+      --border-strong: rgba(255,255,255,0.2);
+    }
+  }
+  body { background: var(--bg-tertiary); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+  #app { background: var(--bg-primary); border-radius: var(--radius-lg); border: 0.5px solid var(--border); width: 100%; max-width: 680px; display: flex; flex-direction: column; height: 640px; overflow: hidden; }
+  #header { padding: 14px 20px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 12px; background: var(--bg-primary); }
+  #avatar { width: 36px; height: 36px; border-radius: 50%; background: #E6F1FB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #header-info h1 { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+  #header-info p { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  #status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #639922; margin-right: 5px; }
+  #messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; background: var(--bg-tertiary); }
+  .msg-row { display: flex; gap: 10px; align-items: flex-start; }
+  .msg-row.user { flex-direction: row-reverse; }
+  .bot-icon { width: 30px; height: 30px; border-radius: 50%; background: #E6F1FB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .bubble { max-width: 76%; padding: 10px 14px; font-size: 14px; line-height: 1.55; color: var(--text-primary); }
+  .bubble.bot { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: 4px var(--radius-lg) var(--radius-lg) var(--radius-lg); }
+  .bubble.user { background: #185FA5; color: #fff; border-radius: var(--radius-lg) 4px var(--radius-lg) var(--radius-lg); }
+  .rec-cards { margin-top: 10px; display: flex; flex-direction: column; gap: 7px; }
+  .rec-card { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 9px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .rec-left { display: flex; align-items: center; gap: 9px; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; flex-shrink: 0; }
+  .A { background: #E6F1FB; color: #0C447C; }
+  .K { background: #EAF3DE; color: #27500A; }
+  .P { background: #EEEDFE; color: #3C3489; }
+  .B { background: #FAEEDA; color: #633806; }
+  .S { background: #FAECE7; color: #712B13; }
+  .rec-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .rec-link { font-size: 12px; color: #185FA5; text-decoration: none; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+  .rec-link:hover { text-decoration: underline; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { font-size: 12px; padding: 5px 11px; border-radius: 999px; border: 0.5px solid var(--border-strong); background: var(--bg-primary); color: var(--text-secondary); cursor: pointer; transition: background 0.12s; }
+  .chip:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: 4px var(--radius-lg) var(--radius-lg) var(--radius-lg); width: fit-content; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+  #input-area { padding: 12px 16px; border-top: 0.5px solid var(--border); display: flex; gap: 10px; align-items: flex-end; background: var(--bg-primary); }
+  #msg-input { flex: 1; resize: none; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 12px; font-size: 14px; font-family: inherit; color: var(--text-primary); background: var(--bg-secondary); min-height: 38px; max-height: 100px; outline: none; line-height: 1.4; }
+  #msg-input:focus { border-color: var(--accent); }
+  #msg-input:disabled { opacity: 0.5; }
+  #send-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+  #send-btn:hover { background: var(--accent-dark); }
+  #send-btn:disabled { background: var(--bg-secondary); cursor: not-allowed; }
+  .footer-note { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 5px; border-top: 0.5px solid var(--border); background: var(--bg-primary); }
+  code { font-family: monospace; font-size: 11px; } -->
+  *, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: rgba(255,255,255,0.78);
+  --bg-secondary: rgba(255,255,255,0.55);
+  --bg-tertiary: #eef3ff;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+
+  --border: rgba(255,255,255,0.25);
+  --border-strong: rgba(255,255,255,0.45);
+
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+
+  --shadow: 0 10px 30px rgba(37,99,235,0.12);
+
+  --radius-md: 14px;
+  --radius-lg: 24px;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, #dbeafe 0%, transparent 30%),
+    radial-gradient(circle at bottom right, #c7d2fe 0%, transparent 35%),
+    linear-gradient(135deg, #eef2ff, #f8fafc);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+#app {
+  width: 100%;
+  max-width: 720px;
+  height: 680px;
+
+  background: var(--bg-primary);
+  backdrop-filter: blur(18px);
+
+  border: 1px solid var(--border);
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: var(--shadow);
+}
+
+#header {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(14px);
+}
+
+#avatar,
+.bot-icon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 12px rgba(37,99,235,0.15);
+}
+
+#header-info h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+#header-info p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+#status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+  margin-right: 6px;
+
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: .6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#messages {
+  flex: 1;
+  overflow-y: auto;
+
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.msg-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.msg-row.user {
+  flex-direction: row-reverse;
+}
+
+.bubble {
+  max-width: 78%;
+  padding: 14px 18px;
+
+  font-size: 14px;
+  line-height: 1.65;
+
+  border-radius: 22px;
+
+  animation: fadeUp .25s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bubble.bot {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255,255,255,0.3);
+
+  color: var(--text-primary);
+
+  border-top-left-radius: 6px;
+}
+
+.bubble.user {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+
+  color: white;
+
+  box-shadow: 0 8px 20px rgba(37,99,235,0.22);
+
+  border-top-right-radius: 6px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.chip {
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.75);
+
+  border: 1px solid rgba(255,255,255,0.4);
+
+  font-size: 12px;
+  font-weight: 500;
+
+  color: var(--text-secondary);
+
+  cursor: pointer;
+
+  transition: all 0.22s ease;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+
+  background: white;
+
+  color: var(--accent);
+
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.rec-cards {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rec-card {
+  background: rgba(255,255,255,0.65);
+
+  backdrop-filter: blur(10px);
+
+  border-radius: 18px;
+
+  padding: 12px 14px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  transition: all .2s ease;
+
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.rec-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+
+  padding: 5px 10px;
+
+  border-radius: 999px;
+}
+
+#input-area {
+  padding: 16px 18px;
+
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+
+  background: rgba(255,255,255,0.45);
+
+  backdrop-filter: blur(14px);
+
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+#msg-input {
+  flex: 1;
+
+  border: 1px solid rgba(255,255,255,0.4);
+
+  background: rgba(255,255,255,0.7);
+
+  border-radius: 18px;
+
+  padding: 12px 14px;
+
+  font-size: 14px;
+
+  resize: none;
+
+  outline: none;
+
+  transition: all .2s ease;
+}
+
+#msg-input:focus {
+  border-color: var(--accent);
+
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+}
+
+#send-btn {
+  width: 46px;
+  height: 46px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all .22s ease;
+
+  box-shadow: 0 8px 18px rgba(37,99,235,0.25);
+}
+
+#send-btn:hover {
+  transform: scale(1.06);
+}
+
+.footer-note {
+  text-align: center;
+
+  font-size: 11px;
+
+  color: var(--text-tertiary);
+
+  padding: 7px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div id="avatar"><i class="ti ti-brain" style="font-size:18px; color:#185FA5;"></i></div>
+    <div id="header-info">
+      <h1>AI Assessment Recommender</h1>
+      <p><span id="status-dot"></span>Groq LLM · FAISS Semantic Retrieval · FastAPI</p>
+    </div>
+  </div>
+
+  <div id="messages">
+    <div class="msg-row">
+      <div class="bot-icon"><i class="ti ti-brain" style="font-size:15px; color:#185FA5;"></i></div>
+      <div>
+        <div class="bubble bot">
+          Hi! I help hiring managers find the right assessments for any role.<br>Tell me who you're hiring — the role, level, and key skills to evaluate.
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="quickSend(this)">Java developer, mid-level</span>
+          <span class="chip" onclick="quickSend(this)">Senior data analyst</span>
+          <span class="chip" onclick="quickSend(this)">Entry level customer support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">Connected to <code id="backend-display">your-backend.onrender.com</code> · Max 8 turns</div>
+
+  <div id="input-area">
+    <textarea id="msg-input" placeholder="e.g. I'm hiring a Java developer who works with stakeholders..." rows="1"
+      onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button id="send-btn" onclick="sendMessage()" aria-label="Send">
+      <i class="ti ti-send" style="font-size:16px; color:#fff;"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+
+  const BACKEND_URL = 'https://shl-assistant-backend.onrender.com';
+
+  document.getElementById('backend-display').textContent = BACKEND_URL.replace('https://','');
+
+  const TYPE_MAP = { A:'Ability', K:'Knowledge', P:'Personality', B:'Behaviour', S:'Simulation' };
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('msg-input');
+  const sendBtn = document.getElementById('send-btn');
+  let history = [];
+  let loading = false;
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function quickSend(chip) {
+    inputEl.value = chip.textContent;
+    sendMessage();
+  }
+
+  function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function appendUser(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = `<div class="bubble user">${esc(text)}</div>`;
+    messagesEl.appendChild(row);
+    scrollBottom();
+  }
+
+  function showTyping() {
+    const row = document.createElement('div');
+    row.className = 'msg-row'; row.id = 'typing-row';
+    row.innerHTML = `<div class="bot-icon"><i class="ti ti-brain" style="font-size:15px;color:#185FA5;"></i></div><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    messagesEl.appendChild(row); scrollBottom();
+  }
+
+  function removeTyping() { document.getElementById('typing-row')?.remove(); }
+
+  function appendBot(reply, recs) {
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    let recsHtml = '';
+    if (recs && recs.length > 0) {
+      recsHtml = '<div class="rec-cards">' + recs.map(r => {
+        const tClass = r.test_type || 'K';
+        const tLabel = TYPE_MAP[tClass] || tClass;
+        return `<div class="rec-card">
+          <div class="rec-left">
+            <span class="badge ${tClass}">${tLabel}</span>
+            <span class="rec-name">${esc(r.name)}</span>
+          </div>
+          <a class="rec-link" href="${esc(r.url)}" target="_blank" rel="noopener">
+            View <i class="ti ti-external-link" style="font-size:12px;"></i>
+          </a>
+        </div>`;
+      }).join('') + '</div>';
+    }
+    row.innerHTML = `<div class="bot-icon"><i class="ti ti-brain" style="font-size:15px;color:#185FA5;"></i></div><div><div class="bubble bot">${esc(reply)}${recsHtml}</div></div>`;
+    messagesEl.appendChild(row); scrollBottom();
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || loading) return;
+    inputEl.value = ''; inputEl.style.height = 'auto';
+    loading = true; sendBtn.disabled = true;
+
+    history.push({ role: 'user', content: text });
+    appendUser(text);
+    showTyping();
+
+    try {
+      const res = await fetch(BACKEND_URL + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      removeTyping();
+      const reply = data.reply || 'Something went wrong.';
+      const recs = data.recommendations || [];
+      history.push({ role: 'assistant', content: reply });
+      appendBot(reply, recs);
+
+      if (data.end_of_conversation) {
+        const note = document.createElement('p');
+        note.style.cssText = 'text-align:center;font-size:12px;color:var(--text-tertiary);padding:6px;';
+        note.textContent = 'Conversation complete. Refresh to start again.';
+        messagesEl.appendChild(note);
+        inputEl.disabled = true;
+        sendBtn.disabled = true;
+        return;
+      }
+    } catch(e) {
+      removeTyping();
+      appendBot('Could not reach the backend. Make sure your FastAPI server is running and CORS is enabled at ' + BACKEND_URL, []);
+    }
+
+    loading = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+</script>
+</body>
+</html>
